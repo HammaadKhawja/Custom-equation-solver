@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math & Physics Problem Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .input-section h2,
+        .output-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            font-family: 'Courier New', monospace;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .problem-type {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .type-btn {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .type-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .type-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-solve {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-solve:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-solve:active {
+            transform: translateY(0);
+        }
+
+        .btn-clear {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-clear:hover {
+            background: #e0e0e0;
+        }
+
+        .output-section {
+            border-left: 3px solid #667eea;
+            padding-left: 20px;
+        }
+
+        .solution-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #f9fafb 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            font-size: 0.95em;
+            line-height: 1.8;
+            display: none;
+        }
+
+        .solution-box.active {
+            display: block;
+        }
+
+        .step {
+            margin-bottom: 18px;
+            padding: 15px 18px;
+            background: white;
+            border-left: 5px solid #667eea;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateX(2px);
+        }
+
+        .step-number {
+            font-weight: 700;
+            color: #667eea;
+            background: #f0f4ff;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 10px;
+            display: inline-block;
+            min-width: 65px;
+            text-align: center;
+        }
+
+        .step-content {
+            display: inline-block;
+            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .step-content code {
+            background: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .solution-forms {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .solution-form {
+            margin-bottom: 15px;
+        }
+
+        .solution-form:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-value {
+            background: #f9fafb;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            word-break: break-word;
+            border-left: 4px solid #764ba2;
+            font-size: 0.95em;
+        }
+
+        .form-final {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 15px;
+            border-radius: 6px;
+            border: 2px dashed #667eea;
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 600;
+            font-size: 1em;
+            word-break: break-word;
+        }
+
+        /* Scrollbar styling */
+        .solution-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .solution-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .solution-box::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .solution-box::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        .error-box {
+            background: #fee;
+            border: 2px solid #f88;
+            border-radius: 8px;
+            padding: 15px;
+            color: #c33;
+            display: none;
+        }
+
+        .error-box.active {
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 4px;
+            color: #1565c0;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+
+            .output-section {
+                border-left: none;
+                border-top: 3px solid #667eea;
+                padding-left: 0;
+                padding-top: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .problem-type {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📐 Math & Physics Solver</h1>
+            <p>Step-by-step solutions for your math and physics problems</p>
+        </div>
+
+        <div class="content">
+            <!-- Input Section -->
+            <div class="input-section">
+                <h2>Enter Your Problem</h2>
+
+                <div class="form-group">
+                    <label>Select Problem Type:</label>
+                    <div class="problem-type">
+                        <button class="type-btn active" data-type="equation">📝 Equation</button>
+                        <button class="type-btn" data-type="derivative">📊 Derivative</button>
+                        <button class="type-btn" data-type="integral">∫ Integral</button>
+                        <button class="type-btn" data-type="system">🔗 System</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Problem Input:</label>
+                    <textarea id="problemInput" placeholder="e.g., x**2 - 5*x + 6 = 0"></textarea>
+                    <div class="info-box">
+                        <strong>Tip:</strong> Use ** for exponents, * for multiplication, / for division
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="varLabel" style="display: none;">Variables (comma-separated):</label>
+                    <textarea id="variablesInput" placeholder="e.g., x,y" style="display: none; min-height: 50px;"></textarea>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn-solve" id="solveBtn">Solve</button>
+                    <button class="btn-clear" id="clearBtn">Clear</button>
+                </div>
+            </div>
+
+            <!-- Output Section -->
+            <div class="output-section">
+                <h2>Solution</h2>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Solving...</p>
+                </div>
+
+                <div class="error-box" id="errorBox"></div>
+
+                <div class="solution-box" id="solutionBox"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProblemType = 'equation';
+
+        // Problem type selection
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentProblemType = btn.dataset.type;
+
+                // Show/hide variables input for system type
+                const varLabel = document.getElementById('varLabel');
+                const varInput = document.getElementById('variablesInput');
+                if (currentProblemType === 'system') {
+                    varLabel.style.display = 'block';
+                    varInput.style.display = 'block';
+                } else {
+                    varLabel.style.display = 'none';
+                    varInput.style.display = 'none';
+                }
+            });
+        });
+
+        // Solve button
+        document.getElementById('solveBtn').addEventListener('click', solve);
+
+        // Clear button
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            document.getElementById('problemInput').value = '';
+            document.getElementById('variablesInput').value = '';
+            document.getElementById('solutionBox').innerHTML = '';
+            document.getElementById('solutionBox').classList.remove('active');
+            document.getElementById('errorBox').classList.remove('active');
+            document.getElementById('problemInput').focus();
+        });
+
+        // Enter key to solve
+        document.getElementById('problemInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                solve();
+            }
+        });
+
+        async function solve() {
+            const input = document.getElementById('problemInput').value.trim();
+            const errorBox = document.getElementById('errorBox');
+            const solutionBox = document.getElementById('solutionBox');
+            const loading = document.getElementById('loading');
+
+            // Clear previous results
+            errorBox.classList.remove('active');
+            solutionBox.classList.remove('active');
+
+            if (!input) {
+                errorBox.textContent = 'Please enter a problem';
+                errorBox.classList.add('active');
+                return;
+            }
+
+            // Show loading
+            loading.classList.add('active');
+
+            try {
+                const payload = {
+                    type: currentProblemType,
+                    input: input
+                };
+
+                if (currentProblemType === 'system') {
+                    const variables = document.getElementById('variablesInput').value.trim();
+                    payload.variables = variables || 'x,y,z';
+                }
+
+                const response = await fetch('/api/solve', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Unknown error');
+                }
+
+                // Display solution
+                const steps = data.steps || [];
+                let html = '';
+
+                // Add a header with problem type
+                const problemTypeEmoji = {
+                    'equation': '📝',
+                    'derivative': '📊',
+                    'integral': '∫',
+                    'system': '🔗'
+                };
+                const emoji = problemTypeEmoji[data.type] || '🎯';
+                
+                html += `<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 6px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 1.3em; margin-bottom: 5px;">${emoji}</div>
+                    <div style="font-weight: 600; font-size: 0.9em;">Solution Found!</div>
+                </div>`;
+
+                // Display solution forms if available
+                const solutions = data.solutions || {};
+                if (solutions.final || solutions.expanded || solutions.simplified) {
+                    html += '<div class="solution-forms">';
+                    
+                    if (solutions.expanded && solutions.expanded !== solutions.simplified) {
+                        html += `<div class="solution-form">
+                            <span class="form-label">Expanded Form</span>
+                            <div class="form-value">${escapeHtml(solutions.expanded)}</div>
+                        </div>`;
+                    }
+                    
+                    if (solutions.simplified && solutions.simplified !== solutions.expanded) {
+                        html += `<div class="solution-form">
+                            <span class="form-label">Simplified Form</span>
+                            <div class="form-value">${escapeHtml(solutions.simplified)}</div>
+                        </div>`;
+                    }
+                    
+                    if (solutions.final) {
+                        html += `<div class="solution-form">
+                            <span class="form-label">✨ Final Answer</span>
+                            <div class="form-final">${escapeHtml(solutions.final)}</div>
+                        </div>`;
+                    }
+                    
+                    html += '</div>';
+                }
+
+                // Add steps
+                html += '<div style="margin-top: 20px;"><div style="font-weight: 600; color: #667eea; margin-bottom: 15px; font-size: 1.05em;">📋 Step-by-Step Solution</div>';
+                
+                steps.forEach((step, index) => {
+                    // Enhance visual formatting of mathematical expressions
+                    let formattedStep = escapeHtml(step);
+                    
+                    // Wrap mathematical expressions in code tags
+                    formattedStep = formattedStep.replace(/([a-zA-Z0-9_\+\-\*/\(\)\^\.]+ ?[=<>] ?[a-zA-Z0-9_\+\-\*/\(\)\^\.]+)/g, '<code>$1</code>');
+                    formattedStep = formattedStep.replace(/(x\*\*\d+|x\*\*\(.*?\)|f\(.*?\)|d\/dx)/g, '<code>$1</code>');
+                    
+                    html += `<div class="step">
+                        <span class="step-number">Step ${index + 1}:</span>
+                        <span class="step-content">${formattedStep}</span>
+                    </div>`;
+                });
+                
+                html += '</div>';
+
+                solutionBox.innerHTML = html || '<p>Solution computed successfully!</p>';
+                solutionBox.classList.add('active');
+
+            } catch (error) {
+                errorBox.textContent = '❌ Error: ' + error.message;
+                errorBox.classList.add('active');
+            } finally {
+                loading.classList.remove('active');
+            }
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        // Focus on input
+        document.getElementById('problemInput').focus();
+    </script>
+</body>
+</html>
