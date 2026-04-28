@@ -1,5 +1,7 @@
 # Math & Physics Problem Solver AI
 
+To make it work the main file to open is app.py
+
 An AI-powered solver for mathematical and physics problems using symbolic computation and natural language processing.
 
 ## Features
